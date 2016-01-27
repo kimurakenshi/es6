@@ -22,7 +22,7 @@ gulp.task('copyhtml', function () {
 });
 
 gulp.task("copyjs", function () {
-  return gulp.src("src/app.js", {base : 'src/'})
+  return gulp.src("src/**/*.js", {base : 'src/'})
       .pipe(babel({
         presets : ['es2015']
       }))
