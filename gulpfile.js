@@ -1,6 +1,8 @@
 var gulp = require("gulp");
 var babel = require("gulp-babel");
 var connect = require('gulp-connect');
+var rimraf = require('gulp-rimraf');
+
 
 gulp.task('connect', function() {
   connect.server({
@@ -30,4 +32,9 @@ gulp.task("copyjs", function () {
       .pipe(connect.reload());
 });
 
-gulp.task('default', ['copyhtml','copyjs','connect', 'watch']);
+gulp.task('clean', function() {
+  return gulp.src('./dist', { read: false })
+      .pipe(rimraf());
+});
+
+gulp.task('default', ['clean','copyhtml','copyjs','connect', 'watch']);
