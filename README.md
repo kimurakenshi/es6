@@ -241,3 +241,242 @@ The ability to reference parameters from default parameter assignments works onl
 
 
 ## Unnamed Parameters in ECMAScript 5
+
+When We have an unknown number of parameters in a function and We use arguments to iterate over all of them is not obvious
+what the function does.
+
+## Rest Parameters
+
+A rest parameter is indicated by three dots (...) preceding a named parameter. That named parameter becomes an Array 
+containing the rest of the parameters passed to the function, which is where the name “rest” parameters originates.
+
+```javascript
+function pick(object, ...keys) {
+    let result = Object.create(null);
+    for (let i = 0, len = keys.length; i < len; i++) {
+        result[keys[i]] = object[keys[i]];
+    }
+    return result;
+} 
+```
+
+In this version of the function, keys is a rest parameter that contains all parameters passed after object 
+(unlike arguments, which contains all parameters including the first one). That means you can iterate over keys from 
+beginning to end without worry. As a bonus, you can tell by looking at the function that it is capable of handling any 
+number of parameters.
+
+### Rest Parameter Restrictions
+
+- The first restriction is that there can be only one rest parameter, and the rest parameter must be last.
+- The arguments object always correctly reflects the parameters that were passed into a function regardless of rest 
+parameter usage.
+
+## The Spread Operator
+
+```javascript
+let values = [25, 50, 75, 100]
+
+// equivalent to
+// console.log(Math.max(25, 50, 75, 100));
+console.log(Math.max(...values));           // 100
+```   
+
+## Block-Level Functions
+    
+Block level functions are hoisted to the top of the block in which they are defined, so typeof doSomething returns 
+"function" even though it appears before the function declaration in the code. Once the if block is finished executing, 
+doSomething() no longer exists.
+
+```javascript
+"use strict";
+if (true) {
+    console.log(typeof doSomething);        // "function"
+    function doSomething() {
+        // ...
+    }
+    doSomething();
+}
+console.log(typeof doSomething);            // "undefined"
+```
+
+### Deciding When to Use Block-Level Functions
+
+Block level functions are similar to let function expressions in that the function definition is removed once execution 
+flows out of the block in which it’s defined. The key difference is that block level functions are hoisted to the top 
+of the containing block. Function expressions that use let are not hoisted, as this example illustrates:
+
+```javascript
+"use strict";
+if (true) {
+    console.log(typeof doSomething);        // throws error
+    let doSomething = function () {
+        // ...
+    }
+    doSomething();
+}
+console.log(typeof doSomething);
+```
+
+Here, code execution stops when typeof doSomething is executed, because the let statement hasn’t been executed yet, 
+leaving doSomething() in the TDZ. Knowing this difference, you can choose whether to use block level functions or let 
+expressions based on whether or not you want the hoisting behavior.
+
+
+## Arrow Functions
+   
+- No this, super, arguments, and new.target bindings - The value of this, super, arguments, and new.target inside of the 
+function is by the closest containing nonarrow function. 
+- Cannot be called with new - Arrow functions do not have a [[Construct]] method and therefore cannot be used as 
+constructors. Arrow functions throw an error when used with new.
+- No prototype - since you can’t use new on an arrow function, there’s no need for a prototype. The prototype property of 
+an arrow function doesn’t exist.
+- Can’t change this - The value of this inside of the function can’t be changed. It remains the same throughout the 
+entire lifecycle of the function.
+- No arguments object - Since arrow functions have no arguments binding, you must rely on named and rest parameters to 
+access function arguments..
+- No duplicate named arguments - arrow functions cannot have duplicate named arguments in strict or nonstrict mode, as 
+opposed to nonarrow functions that cannot have duplicate named arguments only in strict mode.
+
+The rest of the differences are also focused on reducing errors and ambiguities inside of arrow functions. By doing so, 
+JavaScript engines are better able to optimize arrow function execution.
+
+### Arrow Function Syntax
+
+```javascript
+var reflect = value => value;
+
+// effectively equivalent to:
+
+var reflect = function(value) {
+    return value;
+};
+```
+
+If you are passing in more than one argument, then you must include parentheses around those arguments, like this:
+
+```javascript
+var sum = (num1, num2) => num1 + num2;
+
+// effectively equivalent to:
+
+var sum = function(num1, num2) {
+    return num1 + num2;
+};
+```
+
+If there are no arguments to the function, then you must include an empty set of parentheses in the declaration, as 
+follows:
+
+```javascript
+var getName = () => "Nicholas";
+
+// effectively equivalent to:
+
+var getName = function() {
+    return "Nicholas";
+};
+```
+
+When you want to provide a more traditional function body, perhaps consisting of more than one expression, then you 
+need to wrap the function body in braces and explicitly define a return value, as in this version of sum():
+
+```javascript
+var sum = (num1, num2) => {
+    return num1 + num2;
+};
+
+// effectively equivalent to:
+
+var sum = function(num1, num2) {
+    return num1 + num2;
+};
+```
+
+You can more or less treat the inside of the curly braces the same as you would in a traditional function, with the 
+exception that arguments is not available.
+
+Curly braces are used to denote the function’s body, which works just fine in the cases you’ve seen so far. But an 
+arrow function that wants to return an object literal outside of a function body must wrap the literal in parentheses. 
+For example:
+
+```javascript
+var getTempItem = id => ({ id: id, name: "Temp" });
+
+// effectively equivalent to:
+
+var getTempItem = function(id) {
+
+    return {
+        id: id,
+        name: "Temp"
+    };
+};
+```
+
+### Creating Immediately-Invoked Function Expressions
+
+One popular use of functions in JavaScript is creating immediately-invoked function expressions (IIFEs). 
+IIFEs allow you to define an anonymous function and call it immediately without saving a reference. This pattern comes 
+in handy when you want to create a scope that is shielded from the rest of a program.
+
+You can accomplish the same thing using arrow functions, so long as you wrap the arrow function in parentheses:
+
+```javascript
+let person = ((name) => {
+
+    return {
+        getName: function() {
+            return name;
+        }
+    };
+
+})("Nicholas");
+
+console.log(person.getName());      // "Nicholas"
+```
+
+Arrow functions have no this binding, which means the value of this inside an arrow function can only be determined by 
+looking up the scope chain. If the arrow function is contained within a nonarrow function, this will be the same as the 
+containing function; otherwise, this is undefined.
+
+
+### Arrow Functions and Arrays
+
+```javascript
+var result = values.sort(function(a, b) {
+    return a - b;
+});
+```
+
+That’s a lot of syntax for a very simple procedure. Compare that to the more terse arrow function version:
+
+```javascript
+var result = values.sort((a, b) => a - b);
+```
+
+### No arguments Binding
+
+Even though arrow functions don’t have their own arguments object, it’s possible for them to access the arguments 
+object from a containing function. That arguments object is then available no matter where the arrow function is 
+executed later on. For example:
+
+```javascript
+function createArrowFunctionReturningFirstArg() {
+    return () => arguments[0];
+}
+var arrowFunction = createArrowFunctionReturningFirstArg(5);
+console.log(arrowFunction());       // 5
+```
+
+### Identifying Arrow Functions
+
+
+
+
+
+
+
+
+
+
+
