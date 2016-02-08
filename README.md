@@ -144,7 +144,100 @@ console.log(message);       // "10 items cost $2.50."
 #### Tagged Templates
 
 
+# Functions
+
+## Functions with Default Parameters
+   
+```javascript
+
+function makeRequest(url, timeout = 2000) {
+    console.log("URL: "url + " Timeout: " + timeout );
+}
+
+makeRequest("someUrl");
+makeRequest("someUrl", 300);
+
+```
+In this case, the default value for timeout will only be used if there is no second argument passed in or if the second argument is explicitly passed in as undefined, as in this example:
+
+```javascript
+// uses default timeout
+makeRequest("/foo", undefined, function(body) {
+    doSomething(body);
+});
+
+// uses default timeout
+makeRequest("/foo");
+
+// doesn't use default timeout
+makeRequest("/foo", null, function(body) {
+    doSomething(body);
+});
+```
+In the case of default parameter values, a value of null is considered to be valid, meaning that in the third call to makeRequest(), the default value for timeout will not be used.
+
+### How Default Parameters Affect the arguments Object
+
+In ECMAScript 5 the arguments object is always updated in nonstrict mode to reflect changes in the named parameters. 
+ECMAScript 5’s strict mode, however, eliminates this confusing aspect of the arguments object. In strict mode, the 
+arguments object does not reflect changes to the named parameters. 
 
 
+The arguments object in a function using ECMAScript 6 default parameters, however, will always behave in the same manner 
+as ECMAScript 5 strict mode, regardless of whether the function is explicitly running in strict mode.
+
+```javascript
+// not in strict mode
+function mixArgs(first, second = "b") {
+    console.log(arguments.length);
+    console.log(first === arguments[0]);
+    console.log(second === arguments[1]);
+    first = "c";
+    second = "d"
+    console.log(first === arguments[0]);
+    console.log(second === arguments[1]);
+}
+
+mixArgs("a");
+```
+
+This outputs:
+
+1
+true
+false
+false
+false
+
+### Default Parameter Expressions
+
+Perhaps the most interesting feature of default parameter values is that the default value need not be a primitive value. You can, for example, execute a function to retrieve the default parameter, like this:
+
+```javascript
+function getValue() {
+    return 5;
+}
+
+function add(first, second = getValue()) {
+    return first + second;
+}
+
+console.log(add(1, 1));     // 2
+console.log(add(1));        // 6
+```
+
+This behavior introduces another interesting capability. You can use a previous parameter as the default for a later parameter. Here’s an example:
+
+```javascript
+function add(first, second = first) {
+    return first + second;
+}
+
+console.log(add(1, 1));     // 2
+console.log(add(1)); 
+```
+
+The ability to reference parameters from default parameter assignments works only for previous arguments, so earlier arguments do not have access to later arguments.
 
 
+## Unnamed Parameters in ECMAScript 5
