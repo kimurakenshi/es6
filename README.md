@@ -492,7 +492,104 @@ stack frame is cleared and reused so long as the following conditions are met:
 ## Property Initializer Shorthand
 
 
-    
+In ECMAScript 6, you can eliminate the duplication that exists around property names and local variables by using the 
+property initializer shorthand. When an object property name is the same as the local variable name, you can simply 
+include the name without a colon and value. For example, createPerson() can be rewritten for ECMAScript 6 as follows:
+
+```javascript
+function createPerson(name, age) {
+    return {
+        name,
+        age
+    };
+}   
+```
+
+## Concise Methods
+
+In ECMAScript 6, the syntax is made more concise by eliminating the colon and the function keyword. That means you can 
+rewrite the previous example like this:
+
+```javascript
+var person = {
+    name: "Nicholas",
+    sayName() {
+        console.log(this.name);
+    }
+};
+```
+
+## Computed Property Names
+
+```javascript
+var lastName = "last name";
+
+var person = {
+    "first name": "Nicholas",
+    [lastName]: "Zakas"
+};
+
+console.log(person["first name"]);      // "Nicholas"
+console.log(person[lastName]);          // "Zakas"
+```
+
+The square brackets inside the object literal indicate that the property name is computed, so its contents are 
+evaluated as a string. That means you can also include expressions such as:
+
+```javascript
+var suffix = " name";
+
+var person = {
+    ["first" + suffix]: "Nicholas",
+    ["last" + suffix]: "Zakas"
+};
+
+console.log(person["first name"]);      // "Nicholas"
+console.log(person["last name"]);       // "Zakas"
+```
+
+## New Methods
+
+### The Object.is() Method
+
+This method accepts two arguments and returns true if the values are equivalent. Two values are considered equivalent 
+when they are of the same type and have the same value. Here are some examples:
+
+```javascript
+console.log(+0 == -0);              // true
+console.log(+0 === -0);             // true
+console.log(Object.is(+0, -0));     // false
+
+console.log(NaN == NaN);            // false
+console.log(NaN === NaN);           // false
+console.log(Object.is(NaN, NaN));   // true
+
+console.log(5 == 5);                // true
+console.log(5 == "5");              // true
+console.log(5 === 5);               // true
+console.log(5 === "5");             // false
+console.log(Object.is(5, 5));       // true
+console.log(Object.is(5, "5"));     // false
+```
+
+### The Object.assign() Method
+
+```javascript
+function EventTarget() { /*...*/ }
+EventTarget.prototype = {
+    constructor: EventTarget,
+    emit: function() { /*...*/ },
+    on: function() { /*...*/ }
+}
+
+var myObject = {}
+Object.assign(myObject, EventTarget.prototype);
+
+myObject.emit("somethingChanged");
+```
+
+
+
 
 
 
