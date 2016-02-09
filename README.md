@@ -468,7 +468,27 @@ var arrowFunction = createArrowFunctionReturningFirstArg(5);
 console.log(arrowFunction());       // 5
 ```
 
-### Identifying Arrow Functions
+## Tail Call Optimization
+
+Perhaps the most interesting change to functions in ECMAScript 6 is an engine optimization, which changes the tail call 
+system. A tail call is when a function is called as the last statement in another function, like this:
+
+```javascript
+function doSomething() {
+    return doSomethingElse();   // tail call
+}
+```
+
+ECMAScript 6 seeks to reduce the size of the call stack for certain tail calls in strict mode (nonstrict mode tail 
+calls are left untouched). With this optimization, instead of creating a new stack frame for a tail call, the current 
+stack frame is cleared and reused so long as the following conditions are met:
+
+1 - The tail call does not require access to variables in the current stack frame (meaning the function is not a closure)
+2 - The function making the tail call has no further work to do after the tail call returns
+3 - The result of the tail call is returned as the function value
+
+    
+
 
 
 
