@@ -588,6 +588,38 @@ Object.assign(myObject, EventTarget.prototype);
 myObject.emit("somethingChanged");
 ```
 
+## Changing an Object’s Prototype
+
+The Object.setPrototypeOf() method accepts two arguments: the object whose prototype should change and the object that 
+should become the first argument’s prototype. For example:
+
+```javascript
+let person = {
+    getGreeting() {
+        return "Hello";
+    }
+};
+
+let dog = {
+    getGreeting() {
+        return "Woof";
+    }
+};
+
+// prototype is person
+let friend = Object.create(person);
+console.log(friend.getGreeting());                      // "Hello"
+console.log(Object.getPrototypeOf(friend) === person);  // true
+
+// set prototype to dog
+Object.setPrototypeOf(friend, dog);
+console.log(friend.getGreeting());                      // "Woof"
+console.log(Object.getPrototypeOf(friend) === dog);     // true
+```
+
+## Easy Prototype Access with Super References
+
+
 
 
 
