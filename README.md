@@ -741,6 +741,15 @@ friend.getGreeting = getGlobalGreeting;
 friend.getGreeting();               // throws error
 ```
 
+Here the getGlobalGreeting() function overwrites the previously-defined getGreeting() method on the friend object. 
+Calling friend.getGreeting() at that point results in an error as well, because it’s now calling the getGlobalGreeting() 
+method, which does not have a [[HomeObject]]. The value of [[HomeObject]] is only set when the function is first created, 
+so even assigning the method onto an object doesn’t fix the problem.
+
+
+
+
+
 
 
 
