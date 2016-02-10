@@ -619,7 +619,127 @@ console.log(Object.getPrototypeOf(friend) === dog);     // true
 
 ## Easy Prototype Access with Super References
 
+in ECMAScript 5:
 
+```javascript
+let person = {
+    getGreeting() {
+        return "Hello";
+    }
+};
+
+let dog = {
+    getGreeting() {
+        return "Woof";
+    }
+};
+
+
+let friend = {
+    getGreeting() {
+        return Object.getPrototypeOf(this).getGreeting.call(this) + ", hi!";
+    }
+};
+
+// set prototype to person
+Object.setPrototypeOf(friend, person);
+console.log(friend.getGreeting());                      // "Hello, hi!"
+console.log(Object.getPrototypeOf(friend) === person);  // true
+```
+
+ECMAScript 6 introduced super. At it’s simplest, super is a pointer to the current object’s prototype, effectively the 
+Object.getPrototypeOf(this) value.
+
+```javascript
+let friend = {
+    getGreeting() {
+        // in the previous example, this is the same as:
+        // Object.getPrototypeOf(this).getGreeting.call(this)
+        return super.getGreeting() + ", hi!";
+    }
+};
+```
+
+## A Formal Method Definition
+   
+ECMAScript 6 formally defines a method as a function that has an internal [[HomeObject]] property containing the object 
+to which the method belongs. Consider the following:
+
+```javascript
+let person = {
+
+    // method
+    getGreeting() {
+        return "Hello";
+    }
+};
+
+// not a method
+function shareGreeting() {
+    return "Hi!";
+}
+```
+
+This example defines person with a single method called getGreeting(). The [[HomeObject]] for getGreeting() is person 
+by virtue of assigning the function directly to an object. The shareGreeting() function, on the other hand, has 
+no [[HomeObject]] specified because it wasn’t assigned to an object when it was created. In most cases, this difference isn’t important, but it becomes very important when using super references.
+
+Any reference to super uses the [[HomeObject]] to determine what to do. The first step is to call 
+Object.getPrototypeOf() on the [[HomeObject]] to retrieve a reference to the prototype. Then, the prototype is searched 
+for a function with the same name. Last, the this-binding is set and the method is called. If a function has no 
+[[HomeObject]], or has a different [[HomeObject]] than expected, then this process won’t work and an error is thrown, 
+as in this code snippet:
+
+```javascript
+let person = {
+    getGreeting() {
+        return "Hello";
+    }
+};
+
+// prototype is person
+let friend = {
+    getGreeting() {
+        return super.getGreeting() + ", hi!";
+    }
+};
+Object.setPrototypeOf(friend, person);
+
+function getGlobalGreeting() {
+    return super.getGreeting() + ", yo!";
+}
+
+console.log(friend.getGreeting());  // "Hello, hi!"
+
+getGlobalGreeting();                // throws error
+```
+
+Calling friend.getGreeting() returns a string, while calling getGlobalGreeting() throws an error for improper use of 
+the super keyword. Since the getGlobalGreeting() function has no [[HomeObject]], it’s not possible to perform a lookup.
+
+Interestingly, the situation doesn’t change if getGlobalGreeting() is later assigned as a method on the friend object, 
+like this:
+
+```javascript
+// prototype is person
+let friend = {
+    getGreeting() {
+        return super.getGreeting() + ", hi!";
+    }
+};
+Object.setPrototypeOf(friend, person);
+
+function getGlobalGreeting() {
+    return super.getGreeting() + ", yo!";
+}
+
+console.log(friend.getGreeting());  // "Hello, hi!"
+
+// assign getGreeting to the global function
+friend.getGreeting = getGlobalGreeting;
+
+friend.getGreeting();               // throws error
+```
 
 
 
