@@ -746,6 +746,329 @@ Calling friend.getGreeting() at that point results in an error as well, because 
 method, which does not have a [[HomeObject]]. The value of [[HomeObject]] is only set when the function is first created, 
 so even assigning the method onto an object doesn’t fix the problem.
 
+# Destructuring for Easier Data Access
+  
+ECMAScript 6 simplifies this task by adding destructuring, which is the process of breaking a data structure down into 
+smaller parts.
+
+## Object Destructuring
+   
+```javascript
+let node = {
+        type: "Identifier",
+        name: "foo"
+    };
+
+let { type, name } = node;
+
+console.log(type);      // "Identifier"
+console.log(name);      // "foo"
+```
+In this code, the value of node.type is stored in a variable called type and the value of node.name is stored in a 
+variable called name.
+ 
+### Destructuring Assignment
+
+ The object destructuring examples so far have used variable declarations. However, it’s also possible to use 
+ destructuring in assignments. For instance, you may decide to change the values of variables after they are defined, 
+ as follows:
+ 
+ ```javascript
+ let node = {
+         type: "Identifier",
+         name: "foo"
+     },
+     type = "Literal",
+     name = 5;
+ 
+ // assign different values using structuring
+ ({ type, name } = node);
+ 
+ console.log(type);      // "Identifier"
+ console.log(name);      // "foo"
+```
+
+### Default Values
+
+You can optionally define a default value to use when a specified property doesn’t exist. To do so, insert an equals 
+sign (=) after the property name and specify the default value, like this:
+
+```javascript
+let node = {
+        type: "Identifier",
+        name: "foo"
+    };
+
+let { type, name, value = true } = node;
+
+console.log(type);      // "Identifier"
+console.log(name);      // "foo"
+console.log(value);     // true
+```
+
+### Assigning to Different Local Variable Names
+
+```javascript
+let node = {
+        type: "Identifier",
+        name: "foo"
+    };
+
+let { type: localType, name: localName } = node;
+
+console.log(localType);     // "Identifier"
+console.log(localName);     // "foo"
+```
+
+### Nested Object Destructuring
+
+```javascript
+let node = {
+        type: "Identifier",
+        name: "foo",
+        loc: {
+            start: {
+                line: 1,
+                column: 1
+            },
+            end: {
+                line: 1,
+                column: 4
+            }
+        }
+    };
+
+let { loc: { start }} = node;
+
+console.log(start.line);        // 1
+console.log(start.column);      // 1
+```
+## Array Destructuring
+   
+Array destructuring syntax is very similar to object destructuring; it just uses array literal syntax instead of object 
+literal syntax. The destructuring operates on positions within an array, rather than the named properties that are 
+available in objects. For example:
+
+```javascript
+let colors = [ "red", "green", "blue" ];
+
+let [ firstColor, secondColor ] = colors;
+
+console.log(firstColor);        // "red"
+console.log(secondColor);       // "green"
+```
+
+If, for example, you just want the third value of an array:
+
+```javascript
+let colors = [ "red", "green", "blue" ];
+
+let [ , , thirdColor ] = colors;
+
+console.log(thirdColor);        // "blue"
+```
+
+### Destructuring Assignment
+
+You can use array destructuring in the context of an assignment, but unlike object destructuring, there is no need to 
+wrap the expression in parentheses. For example:
+
+```javascript
+let colors = [ "red", "green", "blue" ],
+    firstColor = "black",
+    secondColor = "purple";
+
+[ firstColor, secondColor ] = colors;
+
+console.log(firstColor);        // "red"
+console.log(secondColor);       // "green"
+```
+
+Here’s how you can swap variables in ECMAScript 6:
+
+```javascript
+// Swapping variables in ECMAScript 6
+let a = 1,
+    b = 2;
+
+[ a, b ] = [ b, a ];
+
+console.log(a);     // 2
+console.log(b);     // 1
+```
+### Default Values
+
+Array destructuring assignment allows you to specify a default value for any position in the array, too. The default 
+value is used when the property at the given position either doesn’t exist or has the value undefined. For example:
+
+```javascript
+let colors = [ "red" ];
+
+let [ firstColor, secondColor = "green" ] = colors;
+
+console.log(firstColor);        // "red"
+console.log(secondColor);       // "green"
+```
+
+### Nested Destructuring
+
+```javascript
+let colors = [ "red", [ "green", "lightgreen" ], "blue" ];
+
+// later
+
+let [ firstColor, [ secondColor ] ] = colors;
+
+console.log(firstColor);        // "red"
+console.log(secondColor);       // "green"
+```
+### Rest Items
+
+Chapter 3 introduced rest parameters for functions, and array destructuring has a similar concept called rest items. Rest items use the ... syntax to assign the remaining items in an array to a particular variable. Here’s an example:
+
+```javascript
+let colors = [ "red", "green", "blue" ];
+
+let [ firstColor, ...restColors ] = colors;
+
+console.log(firstColor);        // "red"
+console.log(restColors.length); // 2
+console.log(restColors[0]);     // "green"
+console.log(restColors[1]);     // "blue"
+```
+
+A glaring omission from JavaScript arrays is the ability to easily create a clone. In ECMAScript 5, developers 
+frequently used the concat() method as an easy way to clone an array. For example:
+
+```javascript
+// cloning an array in ECMAScript 5
+var colors = [ "red", "green", "blue" ];
+var clonedColors = colors.concat();
+
+console.log(clonedColors);      //"[red,green,blue]"
+```
+While the concat() method is intended to concatenate two arrays together, calling it without an argument returns a 
+clone of the array. In ECMAScript 6, you can use rest items to achieve the same thing through syntax intended to 
+function that way. It works like this:
+
+```javascript
+// cloning an array in ECMAScript 6
+let colors = [ "red", "green", "blue" ];
+let [ ...clonedColors ] = colors;
+
+console.log(clonedColors);      //"[red,green,blue]"
+```
+## Mixed Destructuring
+   
+```javascript
+let node = {
+        type: "Identifier",
+        name: "foo",
+        loc: {
+            start: {
+                line: 1,
+                column: 1
+            },
+            end: {
+                line: 1,
+                column: 4
+            }
+        },
+        range: [0, 3]
+    };
+
+let {
+    loc: { start },
+    range: [ startIndex ]
+} = node;
+
+console.log(start.line);        // 1
+console.log(start.column);      // 1
+console.log(startIndex);        // 0
+```
+
+## Destructured Parameters
+   
+Destructuring has one more particularly helpful use case, and that is when passing function arguments. When a JavaScript 
+function takes a large number of optional parameters, one common pattern is to create an options object whose properties 
+specify the additional parameters, like this:
+
+```javascript
+// properties on options represent additional parameters
+function setCookie(name, value, options) {
+
+    options = options || {};
+
+    let secure = options.secure,
+        path = options.path,
+        domain = options.domain,
+        expires = options.expires;
+
+    // code to set the cookie
+}
+
+// third argument maps to options
+setCookie("type", "js", {
+    secure: true,
+    expires: 60000
+});
+```
+
+Destructured parameters offer an alternative that makes it clearer what arguments a function expects. A destructured 
+parameter uses an object or array destructuring pattern in place of a named parameter. To see this in action, look at 
+this rewritten version of the setCookie() function from the last example:
+
+```javascript
+function setCookie(name, value, { secure, path, domain, expires }) {
+
+    // code to set the cookie
+}
+
+setCookie("type", "js", {
+    secure: true,
+    expires: 60000
+});
+```
+
+This function behaves similarly to the previous example, but now, the third argument uses destructuring to pull out the 
+necessary data. The parameters outside the destructured parameter are clearly expected, and at the same time, it’s clear 
+to someone using setCookie() what options are available in terms of extra arguments. And of course, if the third argument 
+is required, the values it should contain are crystal clear. The destructured parameters also act like regular parameters 
+in that they are set to undefined if they are not passed.
+
+**Destructured Parameters are Required**
+
+If you want the destructured parameter to be required, then this behavior isn’t all that troubling. But if you want the 
+destructured parameter to be optional, you can work around this behavior by providing a default value for the 
+destructured parameter, like this:
+
+```javascript
+function setCookie(name, value, { secure, path, domain, expires } = {}) {
+
+    // ...
+}
+```
+
+Or you can specify the default values:
+
+```javascript
+function setCookie(name, value,
+    {
+        secure = false,
+        path = "/",
+        domain = "example.com",
+        expires = new Date(Date.now() + 360000000)
+    }
+) {
+
+    // ...
+}
+```
+
+
+
+
+
 
 
 
