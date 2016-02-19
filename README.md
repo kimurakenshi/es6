@@ -1065,6 +1065,293 @@ function setCookie(name, value,
 }
 ```
 
+If you want default parameters but also optional parameters you can do something like this:
+
+```javascript
+const setCookieDefaults = {
+        secure: false,
+        path: "/",
+        domain: "example.com",
+        expires: new Date(Date.now() + 360000000)
+    };
+
+function setCookie(name, value,
+    {
+        secure = setCookieDefault.secure,
+        path = setCookieDefault.path,
+        domain = setCookieDefault.domain,
+        expires = setCookieDefault.expires
+    } = setCookieDefaults
+) {
+
+    // ...
+}
+```
+
+# Sets and Maps
+  
+A `set` is a list of values that cannot contain duplicates. 
+A `map` is a collection of keys that are mapped to specific values.As such, each item in a map stores two pieces of data 
+and values are retrieved by specifying the key to read from. Maps are frequently used as caches, storing data that is to 
+be quickly retrieved later on.
+
+## Sets
+
+ECMAScript 6 adds a Set type that is an ordered list of values without duplicates. Sets allow fast access to the data 
+contained within, adding a more efficient manner of tracking discrete values. Sets are created using new Set() and items
+are added to the set by using the add() method. You can see how many items are in the set by using the size property.
+
+```javascript
+let set = new Set();
+set.add(5);
+set.add("5");
+
+console.log(set.size);    // 2
+```
+Sets do not coerce values to determine they are the same. So, a set can contain both the number 5 and the string "5" 
+(internally, the comparison is done using Object.is(). That means you can also add multiple objects to the set and they 
+remain distinct:
+
+```javascript
+let set = new Set(),
+    key1 = {},
+    key2 = {};
+
+set.add(key1);
+set.add(key2);
+
+console.log(set.size);    // 2
+```
+
+You can test to see which values are in the set using the has() method:
+
+```javascript
+let set = new Set();
+set.add(5);
+set.add("5");
+
+console.log(set.has(5));    // true
+console.log(set.has(6));    // false
+```
+
+It’s possible to remove a single value from a set by using the delete() method or you can remove all values from the set 
+by using clear().
+
+The strange difference between the set version of `forEach()` and the array version is that the first and second arguments 
+to the callback function are the same.
+
+The other objects that have forEach() methods, arrays and maps, pass three arguments to their callback functions. The 
+first two arguments for arrays and maps are the value and the key (the numeric index for arrays). Sets do not have keys, 
+so you could either make the callback function accept two arguments (which would make it different from the others) or 
+find a way to keep the callback function the same and accept three arguments.
+
+## WeakSet
+
+The biggest difference between weak sets and regular sets is the weak reference held to the object value. Here’s an 
+example of what that means:
+
+```javascript
+let set = new WeakSet(),
+    key = {};
+
+// add the object to the set
+set.add(key);
+
+console.log(set.has(key));      // true
+
+// remove the last strong reference to key, also removes from weak set
+key = null;
+```
+
+1. The add(), has(), and delete() methods throw an error when passed a non-object.
+2. Weak sets are not iterables and therefore cannot be used in a for-of loop.
+3. Weak sets do not expose any iterators (such as keys() and values()), so there is no way to programmatically 
+determine the contents of a weak set.
+4. Weak sets do not have a forEach() method.
+
+## Maps
+
+The ECMAScript 6 Map type is an ordered list of key-value pairs where both the key and the value can be of any type. 
+Keys are considered to be the same by using Object.is(), so you can have both a key of 5 and a key of "5" because they 
+are different types. This is quite different than using object properties as keys, which always coerce values into 
+strings.
+
+Items are added to maps by using the set() method and passing in the key and the value to associate with the key. 
+You can later retrieve a value by passing the key to get(). For example:
+
+```javascript
+let map = new Map();
+map.set("title", "Understanding ES6");
+map.set("year", 2016);
+
+console.log(map.get("title"));      // "Understanding ES6"
+console.log(map.get("year"));       // 2016
+```
+
+You can also use objects as keys, something that isn’t possible using object properties. Here’s an example:
+
+```javascript
+let map = new Map(),
+    key1 = {},
+    key2 = {};
+
+map.set(key1, 5);
+map.set(key2, 42);
+
+console.log(map.get(key1));         // 5
+console.log(map.get(key2));         // 42
+```
+
+### Map Methods
+
+1. has(key) - determines if the given key exists in the map.
+2. delete(key) - removes the key and its associated value from the map.
+3. clear() - removes all keys and values from the map.
+
+Additionally, maps have a size property that indicates how many key-value pairs it contains. 
+
+### Map Initialization
+
+Also similar to sets, you can initialize a map with data by passing an array to the Map constructor. Each item in the 
+array must itself be an array where the first item is the key and the second is the value. The entire map, therefore, 
+is an array of these two-item arrays, for example:
+
+```javascript
+let map = new Map([ ["name", "Nicholas"], ["age", 25]]);
+
+console.log(map.has("name"));   // true
+console.log(map.get("name"));   // "Nicholas"
+console.log(map.has("age"));    // true
+console.log(map.get("age"));    // 25
+console.log(map.size);          // 2
+```
+
+### The forEach Method
+The forEach() method for maps is similar to forEach() for sets and arrays in that it accepts a callback function that 
+receives three arguments:
+
+- The value from the next position in the map
+- The key for that value
+- The map from which the value is read
+
+```javascript
+let map = new Map([ ["name", "Nicholas"], ["age", 25]]);
+
+map.forEach(function(value, key, ownerMap) {
+    console.log(key + " " + value);
+    console.log(ownerMap === map);
+});
+```
+
+## Weak Maps
+
+Weak maps are to maps what weak sets are to sets, which is a way to store weak object references. In weak maps, every 
+key must be an object (and error is thrown if you try to use a non-object key), and those object references are held 
+weakly so as not to interfere with garbage collection. When there are no other references to a weak map key, the 
+key-value pair is removed from the weak map.
+
+`It’s important to note that only weak map keys, and not weak map values, are weak references. An object stored as a 
+weak map value will prevent garbage collection if all other references are removed.`
+
+### Using Weak Maps
+
+The ECMAScript 6 WeakMap type is an unordered list of key-value pairs where the key must be a non-null object and the 
+value can be of any type.
+
+```javascript
+let map = new WeakMap(),
+    element = document.querySelector(".element");
+
+map.set(element, "Original");
+
+let value = map.get(element);
+console.log(value);             // "Original"
+
+// remove the element
+element.parentNode.removeChild(element);
+element = null;
+
+// the weak map is empty at this point
+```
+
+`Similar to weak sets, there is no way to verify that the weak map is empty because it doesn’t have a size property. 
+Because there are no remaining references to the key, you can’t use get() to attempt to retrieve the value. The weak 
+map has cut off access to the value for that key and, when the garbage collector runs, that memory will be freed.`
+
+### Weak Map Methods
+
+Weak maps have only a couple of additional methods available to interact with its items. There is a has() method to 
+determine if the given key exists in the map and a delete() method to remove a specific key-value pair. There is no 
+clear() method because that would require enumerating keys, and like weak sets, that is not possible with weak maps.
+
+### Private Object Data
+While most developers consider the main use case of weak maps to be associated data with DOM elements, there are many 
+possible uses (and no doubt, some that have yet to be discovered). One practical use of weak maps is to store data that 
+is private to object instances. All object properties are public in ECMAScript 6 and so you need to use some creativity 
+to make data access to objects but not accessible to everything. Consider the following example:
+
+```javascript
+function Person(name) {
+    this._name = name;
+}
+
+Person.prototype.getName = function() {
+    return this._name;
+};
+```
+
+This problem can be solved by using a weak map instead:
+
+```javascript
+let Person = (function() {
+
+    let privateData = new WeakMap();
+
+    function Person(name) {
+        privateData.set(this, { name: name });
+    }
+
+    Person.prototype.getName = function() {
+        return privateData.get(this).name;
+    };
+
+    return Person;
+}());
+```
+
+This version of the code uses a weak map for the private data instead of an object. Because the object instance itself 
+can be used as a key, there’s no need to keep track of a separate ID. When the Person constructor is called, a new entry 
+is made into the weak map with a key of this and a value of an object containing private information (in this case, just 
+name). That information is retrieved inside of getName() by passing this to privateData.get() in order to retrieve the 
+data object and access the name property. In this way, the private information is kept private and will be destroyed 
+whenever an object instance is destroyed.
+
+### Uses and Limitations
+
+When deciding whether to use a weak map or a regular map, the primary decision is whether you want to use only object 
+keys. Anytime you’re going to use only object keys then the best choice is a weak map. That will allow you to optimize 
+memory usage and avoid memory leaks by ensuring that extra data isn’t kept around after it’s no longer accessible.
+
+Keep in mind that weak maps give you very little visibility into their contents, so you can’t use forEach(), size, or 
+clear() to manage the items. If you need some inspection capabilities, then regular maps are a better choice. Just be 
+sure to keep an eye on memory usage.
+
+## Iterators and Generators
+  
+
+
+
+
+
+
+
+
+
+
+                                                                 
+
+
+
 
 
 
