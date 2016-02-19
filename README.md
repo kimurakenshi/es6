@@ -1,5 +1,10 @@
 # ES6 Fundamentals
 
+New features added in ES6 based on the book written by Nicholas Zakas [Understanding ECMAScript 6
+](https://leanpub.com/understandinges6/read)
+
+## Table of contents
+
 - [Block Binding](#block-bindings)
 - [Strings and Regular Expressions](#strings-and-regular-expressions)
 - [Functions](#functions)
@@ -10,8 +15,6 @@
 - [Sets and Maps](#sets-and-maps)
 - [Iterators and Generators](iterators-and-generators)
 
-New features added in ES6 based on the book written by Nicholas Zakas [Understanding ECMAScript 6
-](https://leanpub.com/understandinges6/read)
 
 ## Block Bindings (`block-bindings.js`)
 
