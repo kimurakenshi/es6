@@ -1,5 +1,15 @@
 # ES6 Fundamentals
 
+- [Block Binding](#block-bindings)
+- [Strings and Regular Expressions](#strings-and-regular-expressions)
+- [Functions](#functions)
+- [Rest Parameters](#rest-parameters)
+- [Arrow Functions](#arrow-functions)
+- [Expanded Object Functionality](#expanded-object-functionality)
+- [Destructuring for Easier Data Access](#destructuring-for-easier-data-access)
+- [Sets and Maps](#sets-and-maps)
+- [Iterators and Generators](iterators-and-generators)
+
 New features added in ES6 based on the book written by Nicholas Zakas [Understanding ECMAScript 6
 ](https://leanpub.com/understandinges6/read)
 
@@ -141,12 +151,9 @@ let count = 10,
 console.log(message);       // "10 items cost $2.50."
 ```
 
-#### Tagged Templates
+## Functions
 
-
-# Functions
-
-## Functions with Default Parameters
+### Functions with Default Parameters
    
 ```javascript
 
@@ -176,7 +183,7 @@ makeRequest("/foo", null, function(body) {
 ```
 In the case of default parameter values, a value of null is considered to be valid, meaning that in the third call to makeRequest(), the default value for timeout will not be used.
 
-### How Default Parameters Affect the arguments Object
+#### How Default Parameters Affect the arguments Object
 
 In ECMAScript 5 the arguments object is always updated in nonstrict mode to reflect changes in the named parameters. 
 ECMAScript 5’s strict mode, however, eliminates this confusing aspect of the arguments object. In strict mode, the 
@@ -209,7 +216,7 @@ false
 false
 false
 
-### Default Parameter Expressions
+#### Default Parameter Expressions
 
 Perhaps the most interesting feature of default parameter values is that the default value need not be a primitive value. You can, for example, execute a function to retrieve the default parameter, like this:
 
@@ -240,7 +247,7 @@ console.log(add(1));
 The ability to reference parameters from default parameter assignments works only for previous arguments, so earlier arguments do not have access to later arguments.
 
 
-## Unnamed Parameters in ECMAScript 5
+### Unnamed Parameters in ECMAScript 5
 
 When We have an unknown number of parameters in a function and We use arguments to iterate over all of them is not obvious
 what the function does.
@@ -271,7 +278,7 @@ number of parameters.
 - The arguments object always correctly reflects the parameters that were passed into a function regardless of rest 
 parameter usage.
 
-## The Spread Operator
+### The Spread Operator
 
 ```javascript
 let values = [25, 50, 75, 100]
@@ -281,7 +288,7 @@ let values = [25, 50, 75, 100]
 console.log(Math.max(...values));           // 100
 ```   
 
-## Block-Level Functions
+### Block-Level Functions
     
 Block level functions are hoisted to the top of the block in which they are defined, so typeof doSomething returns 
 "function" even though it appears before the function declaration in the code. Once the if block is finished executing, 
@@ -299,7 +306,7 @@ if (true) {
 console.log(typeof doSomething);            // "undefined"
 ```
 
-### Deciding When to Use Block-Level Functions
+#### Deciding When to Use Block-Level Functions
 
 Block level functions are similar to let function expressions in that the function definition is removed once execution 
 flows out of the block in which it’s defined. The key difference is that block level functions are hoisted to the top 
@@ -468,7 +475,7 @@ var arrowFunction = createArrowFunctionReturningFirstArg(5);
 console.log(arrowFunction());       // 5
 ```
 
-## Tail Call Optimization
+### Tail Call Optimization
 
 Perhaps the most interesting change to functions in ECMAScript 6 is an engine optimization, which changes the tail call 
 system. A tail call is when a function is called as the last statement in another function, like this:
@@ -487,10 +494,9 @@ stack frame is cleared and reused so long as the following conditions are met:
 2. The function making the tail call has no further work to do after the tail call returns
 3. The result of the tail call is returned as the function value
 
-# Expanded Object Functionality
+## Expanded Object Functionality
 
-## Property Initializer Shorthand
-
+### Property Initializer Shorthand
 
 In ECMAScript 6, you can eliminate the duplication that exists around property names and local variables by using the 
 property initializer shorthand. When an object property name is the same as the local variable name, you can simply 
@@ -505,7 +511,7 @@ function createPerson(name, age) {
 }   
 ```
 
-## Concise Methods
+### Concise Methods
 
 In ECMAScript 6, the syntax is made more concise by eliminating the colon and the function keyword. That means you can 
 rewrite the previous example like this:
@@ -519,7 +525,7 @@ var person = {
 };
 ```
 
-## Computed Property Names
+### Computed Property Names
 
 ```javascript
 var lastName = "last name";
@@ -548,9 +554,9 @@ console.log(person["first name"]);      // "Nicholas"
 console.log(person["last name"]);       // "Zakas"
 ```
 
-## New Methods
+### New Methods
 
-### The Object.is() Method
+#### The Object.is() Method
 
 This method accepts two arguments and returns true if the values are equivalent. Two values are considered equivalent 
 when they are of the same type and have the same value. Here are some examples:
@@ -572,7 +578,7 @@ console.log(Object.is(5, 5));       // true
 console.log(Object.is(5, "5"));     // false
 ```
 
-### The Object.assign() Method
+#### The Object.assign() Method
 
 ```javascript
 function EventTarget() { /*...*/ }
@@ -588,7 +594,7 @@ Object.assign(myObject, EventTarget.prototype);
 myObject.emit("somethingChanged");
 ```
 
-## Changing an Object’s Prototype
+### Changing an Object’s Prototype
 
 The Object.setPrototypeOf() method accepts two arguments: the object whose prototype should change and the object that 
 should become the first argument’s prototype. For example:
@@ -617,7 +623,7 @@ console.log(friend.getGreeting());                      // "Woof"
 console.log(Object.getPrototypeOf(friend) === dog);     // true
 ```
 
-## Easy Prototype Access with Super References
+### Easy Prototype Access with Super References
 
 in ECMAScript 5:
 
@@ -660,7 +666,7 @@ let friend = {
 };
 ```
 
-## A Formal Method Definition
+### A Formal Method Definition
    
 ECMAScript 6 formally defines a method as a function that has an internal [[HomeObject]] property containing the object 
 to which the method belongs. Consider the following:
@@ -746,12 +752,12 @@ Calling friend.getGreeting() at that point results in an error as well, because 
 method, which does not have a [[HomeObject]]. The value of [[HomeObject]] is only set when the function is first created, 
 so even assigning the method onto an object doesn’t fix the problem.
 
-# Destructuring for Easier Data Access
+## Destructuring for Easier Data Access
   
 ECMAScript 6 simplifies this task by adding destructuring, which is the process of breaking a data structure down into 
 smaller parts.
 
-## Object Destructuring
+### Object Destructuring
    
 ```javascript
 let node = {
@@ -767,7 +773,7 @@ console.log(name);      // "foo"
 In this code, the value of node.type is stored in a variable called type and the value of node.name is stored in a 
 variable called name.
  
-### Destructuring Assignment
+#### Destructuring Assignment
 
  The object destructuring examples so far have used variable declarations. However, it’s also possible to use 
  destructuring in assignments. For instance, you may decide to change the values of variables after they are defined, 
@@ -788,7 +794,7 @@ variable called name.
  console.log(name);      // "foo"
 ```
 
-### Default Values
+#### Default Values
 
 You can optionally define a default value to use when a specified property doesn’t exist. To do so, insert an equals 
 sign (=) after the property name and specify the default value, like this:
@@ -806,7 +812,7 @@ console.log(name);      // "foo"
 console.log(value);     // true
 ```
 
-### Assigning to Different Local Variable Names
+#### Assigning to Different Local Variable Names
 
 ```javascript
 let node = {
@@ -820,7 +826,7 @@ console.log(localType);     // "Identifier"
 console.log(localName);     // "foo"
 ```
 
-### Nested Object Destructuring
+#### Nested Object Destructuring
 
 ```javascript
 let node = {
@@ -843,7 +849,7 @@ let { loc: { start }} = node;
 console.log(start.line);        // 1
 console.log(start.column);      // 1
 ```
-## Array Destructuring
+### Array Destructuring
    
 Array destructuring syntax is very similar to object destructuring; it just uses array literal syntax instead of object 
 literal syntax. The destructuring operates on positions within an array, rather than the named properties that are 
@@ -868,7 +874,7 @@ let [ , , thirdColor ] = colors;
 console.log(thirdColor);        // "blue"
 ```
 
-### Destructuring Assignment
+#### Destructuring Assignment
 
 You can use array destructuring in the context of an assignment, but unlike object destructuring, there is no need to 
 wrap the expression in parentheses. For example:
@@ -896,7 +902,7 @@ let a = 1,
 console.log(a);     // 2
 console.log(b);     // 1
 ```
-### Default Values
+#### Default Values
 
 Array destructuring assignment allows you to specify a default value for any position in the array, too. The default 
 value is used when the property at the given position either doesn’t exist or has the value undefined. For example:
@@ -910,7 +916,7 @@ console.log(firstColor);        // "red"
 console.log(secondColor);       // "green"
 ```
 
-### Nested Destructuring
+#### Nested Destructuring
 
 ```javascript
 let colors = [ "red", [ "green", "lightgreen" ], "blue" ];
@@ -922,7 +928,7 @@ let [ firstColor, [ secondColor ] ] = colors;
 console.log(firstColor);        // "red"
 console.log(secondColor);       // "green"
 ```
-### Rest Items
+#### Rest Items
 
 Chapter 3 introduced rest parameters for functions, and array destructuring has a similar concept called rest items. Rest items use the ... syntax to assign the remaining items in an array to a particular variable. Here’s an example:
 
@@ -958,7 +964,7 @@ let [ ...clonedColors ] = colors;
 
 console.log(clonedColors);      //"[red,green,blue]"
 ```
-## Mixed Destructuring
+### Mixed Destructuring
    
 ```javascript
 let node = {
@@ -987,7 +993,7 @@ console.log(start.column);      // 1
 console.log(startIndex);        // 0
 ```
 
-## Destructured Parameters
+### Destructured Parameters
    
 Destructuring has one more particularly helpful use case, and that is when passing function arguments. When a JavaScript 
 function takes a large number of optional parameters, one common pattern is to create an options object whose properties 
@@ -1088,14 +1094,14 @@ function setCookie(name, value,
 }
 ```
 
-# Sets and Maps
+## Sets and Maps
   
 A `set` is a list of values that cannot contain duplicates. 
 A `map` is a collection of keys that are mapped to specific values.As such, each item in a map stores two pieces of data 
 and values are retrieved by specifying the key to read from. Maps are frequently used as caches, storing data that is to 
 be quickly retrieved later on.
 
-## Sets
+### Sets
 
 ECMAScript 6 adds a Set type that is an ordered list of values without duplicates. Sets allow fast access to the data 
 contained within, adding a more efficient manner of tracking discrete values. Sets are created using new Set() and items
@@ -1145,7 +1151,7 @@ first two arguments for arrays and maps are the value and the key (the numeric i
 so you could either make the callback function accept two arguments (which would make it different from the others) or 
 find a way to keep the callback function the same and accept three arguments.
 
-## WeakSet
+### WeakSet
 
 The biggest difference between weak sets and regular sets is the weak reference held to the object value. Here’s an 
 example of what that means:
@@ -1169,7 +1175,7 @@ key = null;
 determine the contents of a weak set.
 4. Weak sets do not have a forEach() method.
 
-## Maps
+### Maps
 
 The ECMAScript 6 Map type is an ordered list of key-value pairs where both the key and the value can be of any type. 
 Keys are considered to be the same by using Object.is(), so you can have both a key of 5 and a key of "5" because they 
@@ -1202,7 +1208,7 @@ console.log(map.get(key1));         // 5
 console.log(map.get(key2));         // 42
 ```
 
-### Map Methods
+#### Map Methods
 
 1. has(key) - determines if the given key exists in the map.
 2. delete(key) - removes the key and its associated value from the map.
@@ -1210,7 +1216,7 @@ console.log(map.get(key2));         // 42
 
 Additionally, maps have a size property that indicates how many key-value pairs it contains. 
 
-### Map Initialization
+#### Map Initialization
 
 Also similar to sets, you can initialize a map with data by passing an array to the Map constructor. Each item in the 
 array must itself be an array where the first item is the key and the second is the value. The entire map, therefore, 
@@ -1226,7 +1232,7 @@ console.log(map.get("age"));    // 25
 console.log(map.size);          // 2
 ```
 
-### The forEach Method
+#### The forEach Method
 The forEach() method for maps is similar to forEach() for sets and arrays in that it accepts a callback function that 
 receives three arguments:
 
@@ -1243,7 +1249,7 @@ map.forEach(function(value, key, ownerMap) {
 });
 ```
 
-## Weak Maps
+### Weak Maps
 
 Weak maps are to maps what weak sets are to sets, which is a way to store weak object references. In weak maps, every 
 key must be an object (and error is thrown if you try to use a non-object key), and those object references are held 
@@ -1253,7 +1259,7 @@ key-value pair is removed from the weak map.
 `It’s important to note that only weak map keys, and not weak map values, are weak references. An object stored as a 
 weak map value will prevent garbage collection if all other references are removed.`
 
-### Using Weak Maps
+#### Using Weak Maps
 
 The ECMAScript 6 WeakMap type is an unordered list of key-value pairs where the key must be a non-null object and the 
 value can be of any type.
@@ -1278,13 +1284,13 @@ element = null;
 Because there are no remaining references to the key, you can’t use get() to attempt to retrieve the value. The weak 
 map has cut off access to the value for that key and, when the garbage collector runs, that memory will be freed.`
 
-### Weak Map Methods
+#### Weak Map Methods
 
 Weak maps have only a couple of additional methods available to interact with its items. There is a has() method to 
 determine if the given key exists in the map and a delete() method to remove a specific key-value pair. There is no 
 clear() method because that would require enumerating keys, and like weak sets, that is not possible with weak maps.
 
-### Private Object Data
+##### Private Object Data
 While most developers consider the main use case of weak maps to be associated data with DOM elements, there are many 
 possible uses (and no doubt, some that have yet to be discovered). One practical use of weak maps is to store data that 
 is private to object instances. All object properties are public in ECMAScript 6 and so you need to use some creativity 
@@ -1326,7 +1332,7 @@ name). That information is retrieved inside of getName() by passing this to priv
 data object and access the name property. In this way, the private information is kept private and will be destroyed 
 whenever an object instance is destroyed.
 
-### Uses and Limitations
+#### Uses and Limitations
 
 When deciding whether to use a weak map or a regular map, the primary decision is whether you want to use only object 
 keys. Anytime you’re going to use only object keys then the best choice is a weak map. That will allow you to optimize 
