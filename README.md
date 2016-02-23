@@ -14,6 +14,7 @@ New features added in ES6 based on the book written by Nicholas Zakas [Understan
 - [Destructuring for Easier Data Access](#destructuring-for-easier-data-access)
 - [Sets and Maps](#sets-and-maps)
 - [Iterators and Generators](iterators-and-generators)
+- [Classes](classes)
 
 
 ## Block Bindings (`block-bindings.js`)
@@ -1347,15 +1348,414 @@ sure to keep an eye on memory usage.
 
 ## Iterators and Generators
   
+When coupled with new array methods and new types of collections (such as sets and maps), iterators become even more 
+important for efficient processing of data.
+
+### What are Iterators?
+
+Iterators are nothing more than objects with a specific interface. That interface consists of a method called next() 
+that returns a result object. The result object has two properties, value, which is the next value, and done, which is 
+a boolean value that’s true when there are no more values to return. The iterator keeps an internal pointer to a 
+location within a collection of values and, with each call to next(), returns the next appropriate value.
+
+If you call next() after the last value has been returned, the method returns done as true and value contains the return 
+value for the iterator. The return value is not considered part of the data set, but rather a final piece of related 
+data or undefined if no such data exists.
+
+### Generators
+
+A generator is a special kind of function that returns an iterator. Generator functions are indicated by inserting a 
+star character (*) after the function keyword.
+The yield keyword is used inside of generators to specify the values that the iterator should return when next() is 
+called. So if you want to return three different values for each successive call to next(), you can do so as follows:
+
+```javascript
+// generator
+function *createIterator() {
+    yield 1;
+    yield 2;
+    yield 3;
+}
+
+// generators are called like regular functions but return an iterator
+let iterator = createIterator();
+
+console.log(iterator.next().value);     // 1
+console.log(iterator.next().value);     // 2
+console.log(iterator.next().value);     // 3
+```
+
+Perhaps the most interesting aspect of generator functions is that they stop execution after each yield statement, so 
+yield 1 executes and then the function doesn’t execute anything else until the iterator’s next() method is called. At 
+that point, execution resumes with the next statement after yield 1, which in this case is yield 2. This ability to 
+stop execution in the middle of a function is extremely powerful and lends to some interesting uses of generator 
+functions.
+
+#### Generator Function Expressions
+
+```javascript
+let createIterator = function *(items) {
+    for (let i=0; i < items.length; i++) {
+        yield items[i];
+    }
+};
+
+let iterator = createIterator([1, 2, 3]);
+
+console.log(iterator.next());           // "{ value: 1, done: false }"
+console.log(iterator.next());           // "{ value: 2, done: false }"
+console.log(iterator.next());           // "{ value: 3, done: false }"
+console.log(iterator.next());           // "{ value: undefined, done: true }"
+
+// for all further calls
+console.log(iterator.next());           // "{ value: undefined, done: true }"
+```
+
+#### Generator Object Methods
+
+```javascript
+var o = {
+
+    createIterator: function *(items) {
+        for (let i=0; i < items.length; i++) {
+            yield items[i];
+        }
+    }
+};
+
+let iterator = o.createIterator([1, 2, 3]);
+```
+
+## Iterables and for-of
+
+Closely related to the concept of an iterator is an iterable. An iterable is an object with a @@iterator symbol property. 
+The well-known @@iterator symbol specifies a function that returns an iterator for the given object. All of the collection 
+objects, including arrays, sets, and maps, as well as strings, are iterables in ECMAScript 6 and so have a default 
+iterator specified. Iterables are designed to be used with a new addition to ECMAScript: the for-of loop.
 
 
+The for-of loop is the second part of the solution to the problem introduced at the beginning of this chapter. Instead 
+of requiring you to track an index into a collection, the for-of loop works by calling next() on an iterable each time 
+through the loop and storing the value from the result object in a variable. The loop continues this process until the 
+done property of the returned object is true. For example:
 
+```javascript
+let values = [1, 2, 3];
 
+for (let num of values) {
+    console.log(num);
+}
+```
 
+The advantage of the for-of loop as opposed to the traditional for loop is that you never have to keep track of an 
+index into a collection. Instead, you can just focus on working with the contents of the collection.
 
+Knowing that `Symbol.iterator` specifies the default iterator, it’s possible to detect if an object is iterable by using 
+the following:
 
+```javascript
+function isIterable(object) {
+    return typeof object[Symbol.iterator] === "function";
+}
+```
 
+### Collection Iterators
 
+ECMAScript 6 has three types of collection objects: arrays, maps, and sets. All three have the same built-in iterators 
+to help you navigate their content. You can retrieve an iterator for a collection by calling one of these methods:
+
+- entries() - returns an iterator whose values are a key-value pair.
+- values() - returns an iterator whose values are the values of the collection.
+- keys() - returns an iterator whose values are the keys contained in the collection.
+
+The entries() iterator returns a two-item array each time next() is called. The two-item array represents the key and 
+value for each item in the collection. For arrays, the first item is the numeric index; for sets, the first item is 
+also the value (since values double as keys in sets); for maps, the first item is the key. Here are some examples:
+
+```javascript
+let colors = [ "red", "green", "blue" ];
+let tracking = new Set([1234, 5678, 9012]);
+let data = new Map();
+
+data.set("title", "Understanding ECMAScript 6");
+data.set("format", "ebook");
+
+for (let entry of colors.entries()) {
+    console.log(entry);
+}
+
+for (let entry of tracking.entries()) {
+    console.log(entry);
+}
+
+for (let entry of data.entries()) {
+    console.log(entry);
+}
+```
+
+This example outputs the following:
+
+```javascript
+[0, "red"]
+[1, "green"]
+[2, "blue"]
+[1234, 1234]
+[5678, 5678]
+[9012, 9012]
+["title", "Understanding ECMAScript 6"]
+["format", "ebook"]
+```
+
+The values() iterator simply returns the values as they are stored in the collection. For example:
+
+```javascript
+let colors = [ "red", "green", "blue" ];
+let tracking = new Set([1234, 5678, 9012]);
+let data = new Map();
+
+data.set("title", "Understanding ECMAScript 6");
+data.set("format", "ebook");
+
+for (let value of colors.values()) {
+    console.log(value);
+}
+
+for (let value of tracking.values()) {
+    console.log(value);
+}
+
+for (let value of data.values()) {
+    console.log(value);
+}
+```
+
+This example outputs the following:
+
+```javascript
+"red"
+"green"
+"blue"
+1234
+5678
+9012
+"Understanding ECMAScript 6"
+"ebook"
+```
+
+The keys() iterator returns each key present in the collection. For arrays, this is the numeric keys only (it never 
+returns other own properties of the array); for sets, the keys are the same as the values and so keys() and values() 
+return the same iterator; for maps, this is each unique key. Here’s an example:
+
+```javascript
+let colors = [ "red", "green", "blue" ];
+let tracking = new Set([1234, 5678, 9012]);
+let data = new Map();
+
+data.set("title", "Understanding ECMAScript 6");
+data.set("format", "ebook");
+
+for (let key of colors.keys()) {
+    console.log(key);
+}
+
+for (let key of tracking.keys()) {
+    console.log(key);
+}
+
+for (let key of data.keys()) {
+    console.log(key);
+}
+```
+
+This example outputs the following:
+
+```javascript
+0
+1
+2
+1234
+5678
+9012
+"title"
+"format"
+```    
+
+Additionally, each collection type has a default iterator that is used by for-of whenever an iterator isn’t explicitly 
+specified. The default iterator for arrays and sets is values() while the default iterator for maps is entries(). This 
+makes it a little bit easier to use collection objects in for-of:
+
+```javascript
+let colors = [ "red", "green", "blue" ];
+let tracking = new Set([1234, 5678, 9012]);
+let data = new Map();
+
+data.set("title", "Understanding ECMAScript 6");
+data.set("format", "ebook");
+
+// same as using colors.values()
+for (let value of colors) {
+    console.log(value);
+}
+
+// same as using tracking.values()
+for (let num of tracking) {
+    console.log(num);
+}
+
+// same as using data.entries()
+for (let entry of data) {
+    console.log(entry);
+}
+```
+
+### String Iterators
+
+ECMAScript 6 has added a lot of functionality to fully support Unicode (see Chapter 2) and as such, the default iterator 
+for strings works on characters rather than code units.
+
+```javascript
+var message = "A ð ®· B";
+
+for (let c of message) {
+    console.log(c);
+}
+This code outputs the following:
+
+A
+(blank)
+ð ®·
+(blank)
+B
+```
+
+### NodeList Iterators
+
+With the addition of default iterators in ECMAScript 6, the DOM definition of NodeList now specifically includes a 
+default iterator that behaves in the same manner as the array default iterator. That means you can use NodeList in a 
+for-of loop or any other place that uses an object’s default iterator. For example:
+
+```javascript
+var divs = document.getElementsByTagName("div");
+
+for (let div of divs) {
+    console.log(div.id);
+}
+```
+
+### Passing Arguments to Iterators
+Throughout this chapter, you’ve seen that iterators can pass values out via the next() method or by using yield in a 
+generator. It’s also possible to pass arguments into the iterator through the next() method. When an argument is passed 
+to next(), it becomes the value of the yield statement inside a generator. For example:
+
+```javascript
+function *createIterator() {
+    let first = yield 1;
+    let second = yield first + 2;       // 4 + 2
+    yield second + 3;                   // 5 + 3
+}
+
+let iterator = createIterator();
+
+console.log(iterator.next());           // "{ value: 1, done: false }"
+console.log(iterator.next(4));          // "{ value: 6, done: false }"
+console.log(iterator.next(5));          // "{ value: 8, done: false }"
+console.log(iterator.next());           // "{ value: undefined, done: true }"
+```
+
+### Generator Return Statements
+
+Since generators are functions, you can use the return statement both to exit early and to specify a return value for 
+the last call to next().
+
+```javascript
+function *createIterator() {
+    yield 1;
+    return 42;
+}
+
+let iterator = createIterator();
+
+console.log(iterator.next());           // "{ value: 1, done: false }"
+console.log(iterator.next());           // "{ value: 42, done: true }"
+console.log(iterator.next());           // "{ value: undefined, done: true }"
+```
+
+### Asynchronous Task Running
+   
+A lot of the excitement around generators is directly related to usage with asynchronous programming. Asynchronous 
+programming in JavaScript is a double-edged sword: it’s very easy to do simple things while complex things become an 
+errand in code organization. Since generators allow you to effectively pause code in the middle of execution, this 
+opens up a lot of possibilities as it relates to asynchronous processing.
+
+#### A Simple Task Runner
+Because yield stops execution and waits for the next() method to be called before starting again, this provides a way 
+to implement asynchronous calls without managing callbacks. To start, you need a function that can call a generator and 
+start the iterator, such as:
+
+```javascript
+function run(taskDef) {
+
+    // create the iterator, make available elsewhere
+    let task = taskDef();
+
+    // start the task
+    let result = task.next();
+
+    // recursive function to keep calling next()
+    function step() {
+
+        // if there's more to do
+        if (!result.done) {
+            result = task.next();
+            step();
+        }
+    }
+
+    // start the process
+    step();
+}
+```
+
+## Classes
+
+### Class Declarations
+    
+```javascript
+class PersonClass {
+
+    // equivalent of the PersonType constructor
+    constructor(name) {
+        this.name = name;
+    }
+
+    // equivalent of PersonType.prototype.sayName
+    sayName() {
+        console.log(this.name);
+    }
+}
+
+let person = new PersonClass("Nicholas");
+person.sayName();   // outputs "Nicholas"
+
+console.log(person instanceof PersonClass);     // true
+console.log(person instanceof Object);          // true
+
+console.log(typeof PersonClass);                    // "function"
+console.log(typeof PersonClass.prototype.sayName);  // "function"
+```
+
+1. Class declarations, unlike function declarations, are not hoisted. Class declarations act like let declarations and 
+so exist in the temporal dead zone until execution reaches the declaration.
+2. All code inside of class declarations runs in strict mode automatically. There’s no way to opt-out of strict mode 
+inside of classes.
+3. All methods are non-enumerable. This is a significant change from custom types, where you need to use 
+Object.defineProperty() to make a method non-enumerable.
+4. All methods have no [[Construct]] internal method and so throw an error if you try to call them with new.
+5. Calling the class constructor without new throws an error.
+6. Attempting to overwrite the class name within a class method throws an error.
+
+### Class Expressions
+    
 
                                                                  
 
