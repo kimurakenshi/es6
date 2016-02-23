@@ -13,8 +13,8 @@ New features added in ES6 based on the book written by Nicholas Zakas [Understan
 - [Expanded Object Functionality](#expanded-object-functionality)
 - [Destructuring for Easier Data Access](#destructuring-for-easier-data-access)
 - [Sets and Maps](#sets-and-maps)
-- [Iterators and Generators](iterators-and-generators)
-- [Classes](classes)
+- [Iterators and Generators](#iterators-and-generators)
+- [Classes](#classes)
 
 
 ## Block Bindings (`block-bindings.js`)
