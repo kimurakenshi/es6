@@ -16,6 +16,8 @@ New features added in ES6 based on the book written by Nicholas Zakas [Understan
 - [Iterators and Generators](#iterators-and-generators)
 - [Classes](#classes)
 - [Arrays](#arrays)
+- [Modules](#modules)
+- [Appendix A: Other Changes](#appendix-a:-other-changes)
 
 ## Block Bindings (`block-bindings.js`)
 
@@ -1965,11 +1967,215 @@ let numbers = translate(1, 2, 3);
 console.log(numbers);               // 2,3,4
 ```
 
+### New methods
 
+#### The find() and findIndex() Methods
 
+The find() and findIndex() methods work the same way. They both accepts two arguments, a callback function and an 
+optional value to use for this inside of that function. 
 
+```javascript
+let numbers = [25, 30, 35, 40, 45];
 
+console.log(numbers.find(n => n > 33));         // 35
+console.log(numbers.findIndex(n => n > 33));    // 2
+```
 
+#### The fill() Method
+
+The fill() method fills one or more array elements with a specific value. When passed a value, fill() overwrites all of 
+the values in an array with that value. For example:
+
+```javascript
+let numbers = [1, 2, 3, 4];
+
+numbers.fill(1);
+
+console.log(numbers.toString());    // 1,1,1,1
+```
+
+Here, the call to numbers.fill(1) changes all of the values in numbers to 1. If you only want to change some of the 
+elements, rather than all of them, you can optionally include a start index and an exclusive end index, such as:
+
+```javascript
+let numbers = [1, 2, 3, 4];
+
+numbers.fill(1, 2);
+
+console.log(numbers.toString());    // 1,2,1,1
+
+numbers.fill(0, 1, 3);
+
+console.log(numbers.toString());    // 1,0,0,1
+```
+
+#### The copyWithin() Method
+
+The copyWithin() method is similar to fill() in that it changes multiple array elements at the same time. However, 
+instead of specifying a single value to assign to array elements, copyWithin() lets you copy array element values from 
+the array itself. To accomplish that, you need to pass two arguments to copyWithin(), the index at which the values 
+should be filled and the index starting at which values should be copied. For instance, if you want to copy the values 
+from the first two elements in the array into the last two items in the array, you can do so as follows:
+
+```javascript
+let numbers = [1, 2, 3, 4];
+
+// paste values into array starting at index 2
+// copy values from array starting at index 0
+numbers.copyWithin(2, 0);
+
+console.log(numbers.toString());    // 1,2,1,2
+```
+
+By default, copyWithin() always copies values up to the end of the array, but you can provide an optional third 
+argument to limit how many elements will be overwritten. That third argument is an exclusive end index at which copying 
+of values stops. Here’s an example:
+
+```javascript
+let numbers = [1, 2, 3, 4];
+
+// paste values into array starting at index 2
+// copy values from array starting at index 0
+// stop copying values when you hit index 1
+numbers.copyWithin(2, 0, 1);
+
+console.log(numbers.toString());    // 1,2,1,4
+```
+
+## Modules
+
+Modules are JavaScript files that are loaded in a special mode (as opposed to scripts, which are loaded in the original 
+way JavaScript worked).
+
+1. Module code automatically runs in strict mode and there’s no way to opt-out of strict mode.
+2. Variables created in the top level of a module are not automatically added to the shared global scope. They exist only 
+3. within the top-level scope of the module.
+4. The value of this in the top level of a module is undefined.
+5. Modules do not allow HTML-style comments within the code (a leftover feature from the early browser days).
+6. Modules must export anything that should be available to code outside of the module.
+
+### Basic Exporting and Importing
+    
+The export keyword is used to expose parts of published code to other modules. In the simplest case, you can place 
+export in front of any variable, function, or class declaration to export it from the module. For example:
+
+```javascript
+// export data
+export var color = "red";
+export let name = "Nicholas";
+export const magicNumber = 7;
+
+// export function
+export function sum(num1, num2) {
+    return num1 + num1;
+}
+
+// export class
+export class Rectangle {
+    constructor(length, width) {
+        this.length = length;
+        this.width = width;
+    }
+}
+
+// this function is private to the module
+function subtract(num1, num2) {
+    return num1 - num2;
+}
+
+// define a function
+function multiply(num1, num2) {
+    return num1 * num2;
+}
+
+// export later
+export multiply;
+```
+
+Once you have a module with exports, you can access the functionality in another module by using the import keyword. 
+An import statement has two parts: the identifiers you’re importing and the module from which those identifiers should 
+be imported. The basic form is as follows:
+
+```javascript
+import { identifier1, identifier2 } from "module";
+```
+
+When importing an identifier from a module, the identifier acts as if it were defined using const. That means you cannot
+define another variable with the same name, use the identifier prior to the import statement, or change its value.
+
+There’s also a special case that allows you to import the entire module as a single object. All of the exports are then 
+available on that object as properties. For example:
+
+```javascript
+// import everything
+import * as example from "example";
+console.log(example.sum(1,
+        example.magicNumber));          // 8
+console.log(example.multiply(1, 2));    // 2
+```
+
+#### Renaming Exports and Imports
+     
+```javascript
+// Rename in import
+function sum(num1, num2) {
+    return num1 + num2;
+}
+
+export { sum as add };
+```
+
+```javascript
+// Rename in export
+import { add as sum } from "example";
+console.log(typeof add);            // "undefined"
+console.log(sum(1, 2));  
+```
+
+#### Exporting and Importing Defaults
+     
+The module syntax is really optimized for exporting and importing default values from modules. The default value for a 
+module is a single variable, function, or class as specified by the default keyword. For example:
+
+```javascript
+export default function(num1, num2) {
+    return num1 + num2;
+}
+```
+
+You can import a default value from a module using the following syntax:
+
+```javascript
+// import the default
+import sum from "example";
+
+console.log(sum(1, 2));     // 3
+```
+This import statement imports the default from the module "example". Note that there are no curly braces used in this 
+case, as would be with a non-default export. The local name sum is used to represent the function that the module 
+exports. This syntax is the cleanest as it’s anticipated to be the dominant form of import on the web, allowing you to 
+use already-existing object, such as:
+
+```javascript
+import $ from "jquery";
+```
+
+## Appendix A: Other Changes
+   
+### Working with Integers
+    
+#### Identifying Integers
+
+The first addition is Number.isInteger(), which allows you to determine if a value represents an integer in JavaScript. 
+Since integers and floats are stored differently, the JavaScript engine looks at the underlying representation of the 
+value to make this determination. That means numbers that look like floats might actually be stored as integers and 
+therefore return true from Number.isInteger(). For example:
+
+```javascript
+console.log(Number.isInteger(25));      // true
+console.log(Number.isInteger(25.0));    // true
+console.log(Number.isInteger(25.1));    // false
+```
 
 
 
