@@ -15,7 +15,7 @@ New features added in ES6 based on the book written by Nicholas Zakas [Understan
 - [Sets and Maps](#sets-and-maps)
 - [Iterators and Generators](#iterators-and-generators)
 - [Classes](#classes)
-
+- [Arrays](#arrays)
 
 ## Block Bindings (`block-bindings.js`)
 
@@ -1756,10 +1756,214 @@ Object.defineProperty() to make a method non-enumerable.
 
 ### Class Expressions
     
+These class expressions are designed to be used in variable declarations or passed into functions as arguments. Here’s 
+the class expression equivalent of the previous examples:
 
-                                                                 
+```javascript
+// class expressions do not require identifiers after "class"
+let PersonClass = class {
 
+    // equivalent of the PersonType constructor
+    constructor(name) {
+        this.name = name;
+    }
 
+    // equivalent of PersonType.prototype.sayName
+    sayName() {
+        console.log(this.name);
+    }
+};
+
+let person = new PersonClass("Nicholas");
+person.sayName();   // outputs "Nicholas"
+
+console.log(person instanceof PersonClass);     // true
+console.log(person instanceof Object);          // true
+
+console.log(typeof PersonClass);                    // "function"
+console.log(typeof PersonClass.prototype.sayName);  // "function"
+```
+
+Whether you use class declarations or class expressions is purely a matter of style. Unlike function declarations and 
+function expressions, both class declarations and class expressions are not hoisted, and so the choice has little 
+bearing on the runtime behavior of the code.
+
+### Accessor Properties
+    
+While own properties should be created inside of class constructors, classes allow you to define accessor properties on 
+the prototype. To create a getter, use the keyword get followed by a space followed by an identifier; to create a 
+setter, do the same using the keyword set. For example:
+
+```javascript
+class CustomHTMLElement {
+
+    constructor(element) {
+        this.element = element;
+    }
+
+    get html() {
+        return this.element.innerHTML;
+    }
+
+    set html(value) {
+        this.element.innerHTML = value;
+    }
+}
+
+var descriptor = Object.getOwnPropertyDescriptor(CustomHTMLElement.prototype,\
+ "html");
+console.log("get" in descriptor);   // true
+console.log("set" in descriptor);   // true
+console.log(descriptor.enumerable); // false
+```
+
+### Static Members
+    
+Classes simplify the creation of static members by using the formal static annotation before the method or accessor 
+property name. Here’s the equivalent of the last example:
+
+```javascript
+class PersonClass {
+
+    // equivalent of the PersonType constructor
+    constructor(name) {
+        this.name = name;
+    }
+
+    // equivalent of PersonType.prototype.sayName
+    sayName() {
+        console.log(this.name);
+    }
+
+    // equivalent of PersonType.create
+    static create(name) {
+        return new PersonClass(name);
+    }
+}
+
+let person = PersonClass.create("Nicholas");
+```
+        
+### Inheritance with Derived Classes
+    
+Classes make inheritance easier by using the familiar extends keyword to specify the function from which the class 
+should inherit. The prototypes are automatically adjusted and you can access the base class constructor using super(). 
+Here’s the equivalent of the previous example:
+        
+```javascript
+class Rectangle {
+    constructor(length, width) {
+        this.length = length;
+        this.width = width;
+    }
+
+    getArea() {
+        return this.length * this.width;
+    }
+}
+
+class Square extends Rectangle {
+    constructor(length) {
+
+        // same as Rectangle.call(this, length, length)
+        super(length, length);
+    }
+}
+
+var square = new Square(3);
+
+console.log(square.getArea());              // 9
+console.log(square instanceof Square);      // true
+console.log(square instanceof Rectangle);   // true
+```
+
+### Shadowing Class Methods
+
+The methods on derived classes always shadow methods of the same name on the base class. For instance, you can add getArea() to Square in order to redefine that functionality:
+
+```javascript
+class Square extends Rectangle {
+    constructor(length) {
+        super(length, length);
+    }
+
+    // override and shadow Rectangle.prototype.getArea()
+    getArea() {
+        return this.length * this.length;
+    }
+}
+```
+                                                                
+### new.target
+    
+In Chapter 3, you learned about new.target and how its value changes depending on how a function is called. You can 
+also use new.target in class constructors to determine how the class is being invoked. In the simple case, new.target 
+is equal to the constructor function for the class:
+                                                                
+```javascript
+class Rectangle {
+    constructor(length, width) {
+        console.log(new.target === Rectangle);
+        this.length = length;
+        this.width = width;
+    }
+}
+
+// new.target is Rectangle
+var obj = new Rectangle(3, 4);      // outputs true
+```
+
+## Arrays
+
+### Creating Arrays
+
+#### Array.of()
+
+The Array.of() method always creates an array containing its arguments regardless of the number of arguments or the 
+argument types. Here are some examples:
+
+```javascript
+let items = Array.of(1, 2);         // length is 2
+console.log(items.length);          // 2
+console.log(items[0]);              // 1
+console.log(items[1]);              // 2
+
+items = Array.of(2);
+console.log(items.length);          // 1
+console.log(items[0]);              // 2
+
+items = Array.of("2");
+console.log(items.length);          // 1
+console.log(items[0]);              // "2"
+```
+
+#### Array.from()
+
+The Array.from() method was added in ECMAScript 6 as a more obvious way of converting objects into arrays. You can pass 
+either an iterable or an array-like object as the first argument and Array.from() returns an array. Here’s a simple 
+example:
+
+```javascript
+function doSomething() {
+    var args = Array.from(arguments);
+
+    // use args
+}
+```
+
+#### Mapping Conversion
+If you want to take this conversion a step further, you can provide a second argument to Array.from() that is a mapping 
+function used to convert each value into a final form. For example:
+
+```javascript
+function translate() {
+    return Array.from(arguments, (value) => value + 1);
+}
+
+let numbers = translate(1, 2, 3);
+
+console.log(numbers);               // 2,3,4
+```
 
 
 
