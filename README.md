@@ -17,7 +17,7 @@ New features added in ES6 based on the book written by Nicholas Zakas [Understan
 - [Classes](#classes)
 - [Arrays](#arrays)
 - [Modules](#modules)
-- [Appendix A: Other Changes](#appendix-a:-other-changes)
+- [Other Changes](#other-changes)
 
 ## Block Bindings (`block-bindings.js`)
 
@@ -2160,7 +2160,7 @@ use already-existing object, such as:
 import $ from "jquery";
 ```
 
-## Appendix A: Other Changes
+## Other Changes
    
 ### Working with Integers
     
